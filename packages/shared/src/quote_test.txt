@@ -1,0 +1,4 @@
+export enum Test {
+  VALUE = "value",
+  VALUE2 = "value2",
+}
