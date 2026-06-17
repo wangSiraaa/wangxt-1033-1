@@ -9,6 +9,18 @@ import {
   NotificationType,
   AuditAction,
   CounselorSpecialty,
+  DutyShiftType,
+  DutyStatus,
+  GroupCounselingStatus,
+  GroupMemberStatus,
+  FollowUpStatus,
+  FollowUpType,
+  TakeoverReason,
+  DailyTrackingStatus,
+  RoomType,
+  CrisisSource,
+  ReferralType,
+  TrackingRecordType,
 } from "./enums";
 
 export interface IUser {
@@ -29,7 +41,9 @@ export interface IRoom {
   roomNumber: string;
   building: string;
   capacity: number;
+  type: RoomType;
   isOnline: boolean;
+  isConfidential: boolean;
   equipment?: string[];
   description?: string;
   isActive: boolean;
@@ -43,6 +57,7 @@ export interface ICounselorSchedule {
   endTime: string;
   roomId?: string;
   isAvailable: boolean;
+  isNightDuty: boolean;
   recurring?: boolean;
   recurringPattern?: string;
 }
@@ -63,6 +78,9 @@ export interface IRiskAssessment {
   recommendation?: string;
   isReassessment: boolean;
   reassessmentDate?: Date;
+  isHighRisk: boolean;
+  triggeredCrisis: boolean;
+  crisisCaseId?: string;
 }
 
 export interface IAppointment {
@@ -80,6 +98,14 @@ export interface IAppointment {
   notes?: string;
   isOnline: boolean;
   onlineLink?: string;
+  isNightDuty: boolean;
+  isGroup: boolean;
+  groupCounselingId?: string;
+  takenOver: boolean;
+  takenOverAt?: Date;
+  takenOverBy?: string;
+  takeoverReason?: TakeoverReason;
+  studentCannotCancel: boolean;
   createdAt: Date;
   updatedAt: Date;
   cancelledAt?: Date;
@@ -95,6 +121,7 @@ export interface ICrisisCase {
   crisisLeaderId?: string;
   status: CrisisStatus;
   severity: RiskLevel;
+  source: CrisisSource;
   title: string;
   description: string;
   reportedAt: Date;
@@ -104,6 +131,18 @@ export interface ICrisisCase {
   policeInvolved: boolean;
   hospitalInvolved: boolean;
   familyNotified: boolean;
+  mentorNotified: boolean;
+  isManualTakeover: boolean;
+  takeoverCounselorId?: string;
+  takeoverReason?: TakeoverReason;
+  takeoverAt?: Date;
+  lastTrackingDate?: Date;
+  nextTrackingDate?: Date;
+  trackingCount: number;
+  isTrackingClosed: boolean;
+  riskAssessmentIds: string[];
+  appointmentIds: string[];
+  referralIds: string[];
 }
 
 export interface ITrackingNote {
@@ -225,4 +264,178 @@ export interface IAvailableSlot {
   roomId?: string;
   roomName?: string;
   isOnline: boolean;
+  isNightDuty: boolean;
+}
+
+export interface IDutySchedule {
+  id: string;
+  counselorId: string;
+  counselorName: string;
+  date: Date;
+  shiftType: DutyShiftType;
+  startTime: string;
+  endTime: string;
+  status: DutyStatus;
+  roomId?: string;
+  roomName?: string;
+  isEmergencyDuty: boolean;
+  phone?: string;
+  notes?: string;
+  swapRequested: boolean;
+  swapRequestedBy?: string;
+  swapRequestedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  createdBy: string;
+}
+
+export interface IGroupCounseling {
+  id: string;
+  title: string;
+  description: string;
+  counselorId: string;
+  counselorName: string;
+  coCounselorIds?: string[];
+  coCounselorNames?: string[];
+  roomId: string;
+  roomName: string;
+  startDate: Date;
+  endDate: Date;
+  startTime: string;
+  endTime: string;
+  totalSessions: number;
+  currentSession: number;
+  maxMembers: number;
+  minMembers: number;
+  status: GroupCounselingStatus;
+  theme?: string;
+  targetPopulation?: string;
+  isConfidential: boolean;
+  registrationDeadline?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  createdBy: string;
+}
+
+export interface IGroupCounselingMember {
+  id: string;
+  groupCounselingId: string;
+  studentId: string;
+  studentName: string;
+  status: GroupMemberStatus;
+  joinedAt: Date;
+  leftAt?: Date;
+  leaveReason?: string;
+  attendanceCount: number;
+  sessionAttendance: Record<string, boolean>;
+  notes?: string;
+  createdAt: Date;
+}
+
+export interface IFollowUp {
+  id: string;
+  crisisCaseId: string;
+  studentId: string;
+  studentName: string;
+  assigneeId: string;
+  assigneeName: string;
+  type: FollowUpType;
+  status: FollowUpStatus;
+  scheduledDate: Date;
+  scheduledTime?: string;
+  completedAt?: Date;
+  result?: string;
+  notes?: string;
+  followUpNumber: number;
+  isMandatory: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ITakeoverRecord {
+  id: string;
+  crisisCaseId: string;
+  appointmentId?: string;
+  studentId: string;
+  studentName: string;
+  originalCounselorId?: string;
+  originalCounselorName?: string;
+  takeoverCounselorId: string;
+  takeoverCounselorName: string;
+  reason: TakeoverReason;
+  reasonDescription?: string;
+  takenOverAt: Date;
+  isActive: boolean;
+  releasedAt?: Date;
+  releasedBy?: string;
+  releaseReason?: string;
+  createdAt: Date;
+}
+
+export interface IDailyTrackingRecord {
+  id: string;
+  crisisCaseId: string;
+  studentId: string;
+  studentName: string;
+  trackerId: string;
+  trackerName: string;
+  trackingDate: Date;
+  status: DailyTrackingStatus;
+  recordType: TrackingRecordType;
+  content: string;
+  moodLevel?: number;
+  sleepStatus?: string;
+  appetiteStatus?: string;
+  isStable: boolean;
+  needsFollowUp: boolean;
+  nextAction?: string;
+  attachments?: string[];
+  createdAt: Date;
+}
+
+export interface IReferralRecord {
+  id: string;
+  crisisCaseId?: string;
+  studentId: string;
+  studentName: string;
+  referralType: ReferralType;
+  referredFrom: string;
+  referredFromName?: string;
+  referredTo: string;
+  referredToName?: string;
+  referralReason: string;
+  referralDate: Date;
+  acceptedAt?: Date;
+  isAccepted: boolean;
+  acceptanceNotes?: string;
+  feedback?: string;
+  createdAt: Date;
+}
+
+export interface ICrisisTimeline {
+  id: string;
+  crisisCaseId: string;
+  type: 'assessment' | 'appointment' | 'referral' | 'tracking' | 'takeover' | 'status_change' | 'note';
+  title: string;
+  description: string;
+  timestamp: Date;
+  actorId?: string;
+  actorName?: string;
+  relatedId?: string;
+  relatedType?: string;
+  details?: Record<string, unknown>;
+}
+
+export interface IHighRiskDetectionResult {
+  studentId: string;
+  studentName: string;
+  isMultipleHighRisk: boolean;
+  highRiskCount: number;
+  timeWindowHours: number;
+  firstAssessmentDate?: Date;
+  latestAssessmentDate?: Date;
+  assessments: IRiskAssessment[];
+  existingCrisisCaseId?: string;
+  shouldEscalate: boolean;
+  escalationReason: string;
 }
